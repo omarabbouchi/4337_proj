@@ -59,3 +59,8 @@ eco_codes = [
 
 df = fetch_ilostat_data(dataflow_ids, eco_codes)
 df.to_csv("ilostat_job_market_data.csv", index=False)
+print("Data fetched and saved to ilostat_job_market_data.csv")
+
+data = fetch_ilostat_data(dataflow_ids, eco_codes)
+print(data.head())
+
