@@ -1,0 +1,56 @@
+In the final project, you will work in groups of four to six to apply the Data Science
+techniques to a new setting that you're interested in. Note that regardless of the group size,
+all groups must submit the work detailed in each milestone. Additionally, each team must
+submit a completed project. All projects require students to spend time gathering data and
+setting up the infrastructure to reach an end result. Each member of the team should
+contribute to both technical and non-technical components of the project.
+You will build a system to solve a well-defined task. Which task you choose is completely
+open-ended, but the methods you use should draw on the ones from the course. Please
+note that finding the right problem is important and this exploration is an essential part of
+the project
+
+Project Update
+
+o Introduction - Brief overview of your problem.
+
+o Literature Review - Description of other work/papers you've found that are
+related to your task. Just mentioning a paper is not sufficient; you should at least
+go into brief detail about what kind of approach they are using/how it relates to
+your work if it's not immediately clear. When looking at relevant literature
+examine if there have there been other attempts to build a similar system.
+Compare and contrast your approach with existing work, citing the relevant
+papers. The comparison should be more than just high-level descriptions. You
+should try to fit your work and other work into the same framework. Are the two
+approaches complementary, orthogonal, or contradictory?
+
+o Dataset - Description of data you are using - size of dataset, distribution of
+classes, any preprocessing you needed to do.
+
+o Baseline - Description and implementation of your baseline. Please provide a
+detailed description of your implemented baseline along with evaluation of the
+baseline using the metrics you define.
+
+o Main approach - Propose a model and an algorithm for tackling your task. You
+should describe the model and algorithm in detail and use a concrete example
+to demonstrate how the model and algorithm work. Don't describe methods in
+general; describe precisely how they apply to your problem (what are the
+inputs/outputs, variables, factors, states, etc.)?
+
+o Evaluation Metric - Please include what metrics, both qualitative and
+quantitative, you are using to evaluate the success of your problem. If relevant
+please include equations to describe your metrics.
+
+o Results & Analysis - At this point, you should have fully implemented your
+baseline and also have a basic working implementation of your main approach.
+Please include the performance of your baseline as well as the performance of
+your main approach so far. Include an analysis of your results, and how this
+might inform your next steps in fine-tuning your main approach.
+
+I will do all sorts of figures and comparisons between our results and what is expected. We do not have any improvements over SOTA, but we can just interpret the results we have
+
+o Future Work - This is not mandatory, but it might be helpful to get an idea of
+what next steps you plan to take after the milestone.
+
+o References - Please include a reference section with properly formatted
+citations. (Not included in 4 page limit).
+

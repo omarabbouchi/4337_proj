@@ -8,8 +8,9 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import os
 from LSTNet import LSTNet
+from datetime import datetime
 
-# Create results directory if it doesn't exist
+# Create results directory
 os.makedirs('results', exist_ok=True)
 
 # Set random seed for reproducibility
@@ -20,30 +21,37 @@ np.random.seed(42)
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 print(f"Using device: {device}")
 
-def load_and_preprocess_data():
-    """Load and preprocess the multivariate unemployment data"""
-    data = pd.read_csv('data/multivariate_unemployment_LSTNet.csv')
-    dates = pd.to_datetime(data['date'])
-    data = data.drop('date', axis=1)
+def load_and_preprocess_data(data_file='multivariate_unemployment_LSTNet.csv'):
+    """Load and preprocess the unemployment data"""
+    data = pd.read_csv(f'data/{data_file}')
+    
+    # Handle different file formats
+    if 'date' in data.columns:
+        # Multivariate format
+        dates = pd.to_datetime(data['date'])
+        features = data.drop('date', axis=1)
+        feature_names = features.columns.tolist()
+    else:
+        # Single series format
+        dates = pd.to_datetime(data['Year'].astype(str) + '-' + data['Period'].str[1:])
+        features = data[['Value']]
+        feature_names = ['Unemployment Rate']
     
     # Scale the data
     scaler = StandardScaler()
-    scaled_data = scaler.fit_transform(data)
+    scaled_data = scaler.fit_transform(features)
     
-    return dates, scaled_data, scaler
+    return dates, scaled_data, scaler, feature_names
 
 def create_sequences(data, seq_length):
     """Create sequences for time series prediction"""
-    # Pre-allocate numpy arrays
     X = np.zeros((len(data) - seq_length, seq_length, data.shape[1]))
     y = np.zeros((len(data) - seq_length, data.shape[1]))
     
-    # Fill arrays
     for i in range(len(data) - seq_length):
         X[i] = data[i:(i + seq_length)]
         y[i] = data[i + seq_length]
     
-    # Convert to tensors in one go
     return torch.FloatTensor(X).to(device), torch.FloatTensor(y).to(device)
 
 def train_model(model, X_train, y_train, X_val, y_val, epochs=100, batch_size=32):
@@ -82,6 +90,22 @@ def train_model(model, X_train, y_train, X_val, y_val, epochs=100, batch_size=32
     
     return train_losses, val_losses
 
+def calculate_metrics(y_true, y_pred, feature_names):
+    """Calculate various metrics for each feature"""
+    metrics = {}
+    for i, feature in enumerate(feature_names):
+        mse = np.mean((y_true[:, i] - y_pred[:, i])**2)
+        mae = np.mean(np.abs(y_true[:, i] - y_pred[:, i]))
+        mape = np.mean(np.abs((y_true[:, i] - y_pred[:, i]) / y_true[:, i])) * 100
+        
+        metrics[feature] = {
+            'MSE': mse,
+            'MAE': mae,
+            'MAPE': mape
+        }
+    
+    return metrics
+
 def plot_predictions(model, X_test, y_test, dates, scaler, feature_names):
     """Plot actual vs predicted values"""
     model.eval()
@@ -92,12 +116,15 @@ def plot_predictions(model, X_test, y_test, dates, scaler, feature_names):
     predictions = scaler.inverse_transform(predictions.cpu().numpy())
     actual = scaler.inverse_transform(y_test.cpu().numpy())
     
+    # Calculate metrics
+    metrics = calculate_metrics(actual, predictions, feature_names)
+    
     # Plot each feature
     for i, feature in enumerate(feature_names):
         plt.figure(figsize=(12, 6))
         plt.plot(dates[-len(actual):], actual[:, i], label='Actual', color='blue')
         plt.plot(dates[-len(predictions):], predictions[:, i], label='Predicted', color='red', linestyle='--')
-        plt.title(f'{feature} - Actual vs Predicted')
+        plt.title(f'{feature} - Actual vs Predicted\nMSE: {metrics[feature]["MSE"]:.4f}, MAE: {metrics[feature]["MAE"]:.4f}, MAPE: {metrics[feature]["MAPE"]:.2f}%')
         plt.xlabel('Date')
         plt.ylabel('Value')
         plt.legend()
@@ -105,6 +132,8 @@ def plot_predictions(model, X_test, y_test, dates, scaler, feature_names):
         plt.tight_layout()
         plt.savefig(f'results/{feature}_prediction.png')
         plt.close()
+    
+    return metrics
 
 def plot_loss_curves(train_losses, val_losses):
     """Plot training and validation loss curves"""
@@ -120,10 +149,9 @@ def plot_loss_curves(train_losses, val_losses):
 
 def main():
     # Load and preprocess data
-    dates, scaled_data, scaler = load_and_preprocess_data()
-    feature_names = ['Unemployment Rate', 'Labor Force Participation Rate', 
-                    'Employment-Population (Men)', 'Employment-Population (Women)',
-                    'U-6 Unemployment Rate']
+    print("Loading data...")
+    dates, scaled_data, scaler, feature_names = load_and_preprocess_data()
+    print(f"Features: {feature_names}")
     
     # Create sequences
     seq_length = 12  # Using 12 months as sequence length
@@ -133,8 +161,8 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=False)
     
-    # Initialize model with device
-    model = LSTNet(device=device)
+    # Initialize model with correct number of features
+    model = LSTNet(num_features=len(feature_names), device=device)
     
     # Train model
     print("Starting training...")
@@ -143,20 +171,18 @@ def main():
     # Plot loss curves
     plot_loss_curves(train_losses, val_losses)
     
-    # Plot predictions
+    # Plot predictions and get metrics
     print("Generating prediction plots...")
-    plot_predictions(model, X_test, y_test, dates, scaler, feature_names)
+    metrics = plot_predictions(model, X_test, y_test, dates, scaler, feature_names)
     
-    # Calculate and print final metrics
-    model.eval()
-    with torch.no_grad():
-        predictions = model(X_test)
-        mse = nn.MSELoss()(predictions, y_test)
-        mae = nn.L1Loss()(predictions, y_test)
+    # Print final metrics
+    print("\nFinal Metrics:")
+    for feature, feature_metrics in metrics.items():
+        print(f"\n{feature}:")
+        print(f"  MSE: {feature_metrics['MSE']:.4f}")
+        print(f"  MAE: {feature_metrics['MAE']:.4f}")
+        print(f"  MAPE: {feature_metrics['MAPE']:.2f}%")
     
-    print(f"\nFinal Metrics:")
-    print(f"Test MSE: {mse.item():.4f}")
-    print(f"Test MAE: {mae.item():.4f}")
     print("\nPlots have been saved to the 'results' directory.")
 
 if __name__ == "__main__":
