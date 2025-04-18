@@ -133,8 +133,8 @@ def main():
     X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, shuffle=False)
     X_train, X_val, y_train, y_val = train_test_split(X_train, y_train, test_size=0.2, shuffle=False)
     
-    # Initialize model
-    model = LSTNet().to(device)
+    # Initialize model with device
+    model = LSTNet(device=device)
     
     # Train model
     print("Starting training...")
