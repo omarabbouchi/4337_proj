@@ -13,7 +13,6 @@
    Running this will:
    - Load the unemployment data
    - Train the LSTNet model and save to models/
-   - Generate prediction plots in results/
 
 Evaluating the Model
 
