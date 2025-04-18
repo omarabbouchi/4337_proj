@@ -1,5 +1,5 @@
 Setup Environment:
-    pip install torch pandas numpy scikit-learn requests matplotlib seaborn
+    pip install -r requirements.txt
 
 Running the Model:
-   python run_model.py
+   python train.py

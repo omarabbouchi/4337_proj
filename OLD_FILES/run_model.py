@@ -7,7 +7,7 @@ from sklearn.model_selection import train_test_split
 import matplotlib.pyplot as plt
 import seaborn as sns
 import os
-from LSTNet import LSTNet
+from OLD_FILES.LSTNet import LSTNet
 from datetime import datetime
 
 # Create results directory
