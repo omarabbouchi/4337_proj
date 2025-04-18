@@ -7,23 +7,15 @@ from pathlib import Path
 import config
 
 def plot_predictions(dates, actual, predicted, feature_names, metrics):
-    """
-    Plot actual vs predicted values for each feature.
-    
-    Args:
-        dates (pd.Series): Date index
-        actual (np.ndarray): Actual values
-        predicted (np.ndarray): Predicted values
-        feature_names (list): List of feature names
-        metrics (dict): Dictionary of metrics for each feature
-    """
+    # Make sure we have a place to save the plots
     results_dir = Path(config.DATA_CONFIG['results_dir'])
     results_dir.mkdir(exist_ok=True)
     
+    # Plot each feature separately
     for i, feature in enumerate(feature_names):
         plt.figure(figsize=config.VISUALIZATION_CONFIG['figure_size'])
         
-        # Plot actual and predicted values
+        # Plot the actual values in blue
         plt.plot(
             dates[-len(actual):], 
             actual[:, i], 
@@ -31,6 +23,8 @@ def plot_predictions(dates, actual, predicted, feature_names, metrics):
             color=config.VISUALIZATION_CONFIG['colors']['actual'],
             linewidth=config.VISUALIZATION_CONFIG['line_width']
         )
+        
+        # Plot the predicted values in red
         plt.plot(
             dates[-len(predicted):], 
             predicted[:, i], 
@@ -40,13 +34,15 @@ def plot_predictions(dates, actual, predicted, feature_names, metrics):
             linewidth=config.VISUALIZATION_CONFIG['line_width']
         )
         
-        # Add title and labels
+        # Add title with metrics
         plt.title(
             f'{feature} - Actual vs Predicted\n'
             f'MSE: {metrics[feature]["MSE"]:.4f}, '
             f'MAE: {metrics[feature]["MAE"]:.4f}, '
             f'MAPE: {metrics[feature]["MAPE"]:.2f}%'
         )
+        
+        # Add labels and make it look nice
         plt.xlabel('Date')
         plt.ylabel('Value')
         plt.legend()
@@ -58,16 +54,10 @@ def plot_predictions(dates, actual, predicted, feature_names, metrics):
         plt.close()
 
 def plot_loss_curves(train_losses, val_losses):
-    """
-    Plot training and validation loss curves.
-    
-    Args:
-        train_losses (list): List of training losses
-        val_losses (list): List of validation losses
-    """
+    # Create a new figure
     plt.figure(figsize=config.VISUALIZATION_CONFIG['figure_size'])
     
-    # Plot loss curves
+    # Plot both loss curves
     plt.plot(
         train_losses, 
         label='Training Loss',
@@ -79,7 +69,7 @@ def plot_loss_curves(train_losses, val_losses):
         linewidth=config.VISUALIZATION_CONFIG['line_width']
     )
     
-    # Add title and labels
+    # Add labels and title
     plt.title('Training and Validation Loss')
     plt.xlabel('Epoch')
     plt.ylabel('Loss')
@@ -92,12 +82,7 @@ def plot_loss_curves(train_losses, val_losses):
     plt.close()
 
 def print_metrics(metrics):
-    """
-    Print metrics for each feature in a readable format.
-    
-    Args:
-        metrics (dict): Dictionary of metrics for each feature
-    """
+    # Print metrics in a nice format
     print("\nFinal Metrics:")
     for feature, feature_metrics in metrics.items():
         print(f"\n{feature}:")

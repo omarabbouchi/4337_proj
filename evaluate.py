@@ -10,12 +10,6 @@ from src.visualization.plotter import plot_predictions, print_metrics
 from OLD_FILES.LSTNet import LSTNet
 
 def load_trained_model():
-    """
-    Load the trained model and scaler.
-    
-    Returns:
-        tuple: (model, scaler, feature_names)
-    """
     # Load model
     model_path = Path(config.DATA_CONFIG['models_dir']) / 'lstnet_model.pth'
     checkpoint = torch.load(model_path)
@@ -35,15 +29,6 @@ def load_trained_model():
     return model, scaler, feature_names
 
 def evaluate_model(model, scaler, feature_names, data_file=None):
-    """
-    Evaluate the model on new data.
-    
-    Args:
-        model (LSTNet): The trained model
-        scaler (StandardScaler): The fitted scaler
-        feature_names (list): List of feature names
-        data_file (str, optional): Data file to evaluate on
-    """
     # Load and preprocess data
     print("\nLoading data...")
     dates, scaled_data, _, _ = load_data(data_file)

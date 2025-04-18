@@ -1,5 +1,0 @@
-Setup Environment:
-    pip install -r requirements.txt
-
-Running the Model:
-   python train.py

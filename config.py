@@ -1,5 +1,5 @@
 """
-Configuration settings for the LSTNet model and training process.
+Configuration settings for the LSTNet model and training process
 """
 
 # Model parameters

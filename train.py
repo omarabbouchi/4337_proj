@@ -144,29 +144,9 @@ def main():
     print("\nStep 6: Saving model and scaler...")
     save_model(model, feature_names)
     save_scaler(scaler, feature_names)
+
     
-    # Step 7: Generate predictions and metrics
-    print("\nStep 7: Generating predictions and metrics...")
-    model.eval()
-    with torch.no_grad():
-        predictions = model(X_test)
-    
-    # Convert to numpy arrays and inverse transform
-    predictions = predictions.cpu().numpy()
-    y_test = y_test.cpu().numpy()
-    predictions = scaler.inverse_transform(predictions)
-    y_test = scaler.inverse_transform(y_test)
-    
-    # Calculate metrics
-    metrics = calculate_metrics(y_test, predictions, feature_names)
-    
-    # Step 8: Visualize results
-    print("\nStep 8: Visualizing results...")
-    plot_predictions(dates, y_test, predictions, feature_names, metrics)
-    plot_loss_curves(train_losses, val_losses)
-    print_metrics(metrics)
-    
-    print("\nTraining complete! Results have been saved to the 'results' directory.")
+    print("\nTraining complete! Model has been saved to models/")
 
 if __name__ == "__main__":
     main() 
