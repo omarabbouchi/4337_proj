@@ -95,59 +95,20 @@ def plot_loss_curves(train_losses, val_losses):
     plt.savefig(results_dir / 'loss_curves.png', dpi=300, bbox_inches='tight')
     plt.close()
 
-def plot_error_summary(metrics):
-    """Create a summary bar plot of error metrics across all features"""
-    features = list(metrics.keys())
-    mape_values = [metrics[feature]['MAPE'] for feature in features]
-    
-    plt.figure(figsize=(10, 4))
-    bars = plt.bar(features, mape_values, color='gray')
-    
-    # Add value labels on top of each bar
-    for bar in bars:
-        height = bar.get_height()
-        plt.text(bar.get_x() + bar.get_width()/2., height,
-                f'{height:.1f}%',
-                ha='center', va='bottom')
-    
-    plt.title('Mean Absolute Percentage Error (MAPE) by Feature')
-    plt.ylabel('MAPE (%)')
-    plt.xticks(rotation=45)
-    plt.grid(True, linestyle='--', alpha=0.7)
-    plt.tight_layout()
-    
-    # Save the plot
-    results_dir = Path(config.DATA_CONFIG['results_dir'])
-    results_dir.mkdir(exist_ok=True)
-    plt.savefig(results_dir / 'error_summary.png', dpi=300, bbox_inches='tight')
-    plt.close()
-
 def plot_model_results_summary(actual, predicted, feature_names, metrics):
-    """Create a comprehensive summary plot of model results"""
+    """Create a summary plot of model error metrics"""
+    # Create shortened names mapping
+    name_mapping = {
+        'Unemployment Rate': 'UR',
+        'Labor Force Participation Rate': 'LFPR',
+        'Employment-Population (Men)': 'EPR (M)',
+        'Employment-Population (Women)': 'EPR (W)',
+        'U-6 Unemployment Rate (Underemployment)': 'U6'
+    }
+    
     n_features = len(feature_names)
-    fig, axes = plt.subplots(2, 1, figsize=(10, 8))
+    plt.figure(figsize=(10, 5))
     
-    # Plot 1: Actual vs Predicted for all features
-    for i, feature in enumerate(feature_names):
-        axes[0].plot(
-            actual[:, i], 
-            label=f'Actual {feature}',
-            color='black',
-            linewidth=1.5
-        )
-        axes[0].plot(
-            predicted[:, i], 
-            label=f'Predicted {feature}',
-            color='red',
-            linestyle='--',
-            linewidth=1.5
-        )
-    
-    axes[0].set_title('Actual vs Predicted Values')
-    axes[0].legend(frameon=True, framealpha=1.0, ncol=2)
-    axes[0].grid(True, linestyle='--', alpha=0.7)
-    
-    # Plot 2: Error metrics comparison
     x = np.arange(n_features)
     width = 0.25
     
@@ -155,15 +116,29 @@ def plot_model_results_summary(actual, predicted, feature_names, metrics):
     mae_values = [metrics[feature]['MAE'] for feature in feature_names]
     mse_values = [metrics[feature]['MSE'] for feature in feature_names]
     
-    axes[1].bar(x - width, mape_values, width, label='MAPE (%)', color='gray')
-    axes[1].bar(x, mae_values, width, label='MAE', color='lightgray')
-    axes[1].bar(x + width, mse_values, width, label='MSE', color='darkgray')
+    # Create bars with different patterns
+    plt.bar(x - width, mape_values, width, label='MAPE (%)', 
+           color='#f0f0f0', edgecolor='black', hatch='')
+    plt.bar(x, mae_values, width, label='MAE',
+           color='black', hatch='')
+    plt.bar(x + width, mse_values, width, label='MSE',
+           color='white', edgecolor='black', hatch='xxx')
     
-    axes[1].set_title('Error Metrics Comparison')
-    axes[1].set_xticks(x)
-    axes[1].set_xticklabels(feature_names, rotation=45)
-    axes[1].legend(frameon=True, framealpha=1.0)
-    axes[1].grid(True, linestyle='--', alpha=0.7)
+    # Add only MAPE value labels
+    label_offset = 0.1
+    for i, mape in enumerate(mape_values):
+        plt.text(x[i] - width, mape + label_offset, f'{mape:.1f}%', 
+                ha='center', va='bottom', fontsize=8)
+    
+    plt.title('Model Performance Metrics by Feature')
+    shortened_names = [name_mapping.get(name, name) for name in feature_names]
+    plt.xticks(x, shortened_names, rotation=45, ha='right')
+    plt.ylabel('Error Value')
+    plt.legend(frameon=True, framealpha=1.0, loc='upper right')
+    plt.grid(True, linestyle='--', alpha=0.7, axis='y')
+    
+    # Add more top margin
+    plt.margins(y=0.2)
     
     plt.tight_layout()
     

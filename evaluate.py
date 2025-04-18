@@ -6,7 +6,11 @@ import numpy as np
 from pathlib import Path
 import config
 from src.data.data_processor import load_data, create_sequences, load_scaler
-from src.visualization.plotter import plot_predictions, print_metrics
+from src.visualization.plotter import (
+    plot_predictions, 
+    print_metrics,
+    plot_model_results_summary
+)
 from OLD_FILES.LSTNet import LSTNet
 
 def load_trained_model():
@@ -62,8 +66,9 @@ def evaluate_model(model, scaler, feature_names, data_file=None):
         }
     
     # Visualize results
-    print("\nVisualizing results...")
+    print("\nGenerating visualizations...")
     plot_predictions(dates, y, predictions, feature_names, metrics)
+    plot_model_results_summary(y, predictions, feature_names, metrics)
     print_metrics(metrics)
     
     print("\nEvaluation complete! Results have been saved to the 'results' directory.")
