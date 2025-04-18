@@ -33,11 +33,54 @@ DATA_CONFIG = {
 
 # Visualization parameters
 VISUALIZATION_CONFIG = {
-    'figure_size': (12, 6),
-    'font_size': 12,
-    'line_width': 2,
+    # Figure settings
+    'figure_size': (10, 5),
+    'dpi': 300,
+    
+    # Font settings
+    'font_family': 'Times New Roman',
+    'font_size': 10,
+    'title_size': 12,
+    'label_size': 10,
+    'tick_size': 8,
+    'legend_size': 8,
+    
+    # Colors and styles
     'colors': {
-        'actual': 'blue',
-        'predicted': 'red'
-    }
+        'actual': 'black',
+        'predicted': 'red',
+        'mape_bar': '#f0f0f0',
+        'mae_bar': 'black',
+        'mse_bar': 'white'
+    },
+    'line_styles': {
+        'actual': '-',
+        'predicted': '--'
+    },
+    'line_width': 1.5,
+    'grid_alpha': 0.7,
+    'grid_style': '--',
+    
+    # Bar chart settings
+    'bar_width': 0.25,
+    'bar_patterns': {
+        'mape': '',
+        'mae': '',
+        'mse': 'xxx'
+    },
+    
+    # Label settings
+    'show_titles': True,  # Global control for showing/hiding titles
+    'show_value_labels': True,  # Control for showing/hiding value labels
+    'value_label_decimals': {
+        'mape': 1,  # For percentage values
+        'mae': 3,
+        'mse': 3
+    },
+    'label_offset': 0.1,  # Vertical offset for bar value labels
+    
+    # Layout settings
+    'margin_top': 0.2,
+    'x_rotation': 45,
+    'legend_loc': 'upper right'
 } 
